@@ -20,16 +20,22 @@ mv target/release/main async_threads
 
 echo '# Benchmarks:' >> $GITHUB_STEP_SUMMARY
 
+echo 'Started benchmarks'
+
 caddy start
 
-for i in 100 1000 10000 50000 
+for i in 100 1000 5000
 do
     export NUM_REQUESTS=$i
+    
+    echo "Running $i request benchmarks"
 
-    hyperfine ./sync ./threads ./async ./async_threads --export-markdown temp.md
+    hyperfine --runs 3 ./sync ./threads ./async ./async_threads --export-markdown temp.md
 
     echo "### $i requests:" >> $GITHUB_STEP_SUMMARY
     cat temp.md >> $GITHUB_STEP_SUMMARY
 done
+
+echo 'Finished benchmarks'
 
 caddy stop

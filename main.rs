@@ -46,10 +46,9 @@ async fn main() {
 
     let client = Client::new();
 
-    let mut handles = Vec::new();
-    for _ in 1..get_num_requests() {
-        handles.push(tokio::spawn(async_connect_and_read(client.clone())));
-    }
+    let handles = (1..get_num_requests())
+        .map(|_| tokio::spawn(async_connect_and_read(client.clone())))
+        .collect::<Vec<_>>();
 
     for handle in handles {
         handle.await.unwrap();

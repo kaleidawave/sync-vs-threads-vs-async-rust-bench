@@ -31,11 +31,10 @@ fn main() {
 #[cfg_attr(feature = "threads", tokio::main)]
 #[cfg_attr(not(feature = "threads"), tokio::main(flavor = "current_thread"))]
 async fn main() {
-    use futures::future::join_all;
     use hyper::client::{connect::Connect, Client};
     use hyper::{body::HttpBody, Uri};
 
-    async fn async_connect_and_read<C, B>(client: &Client<C, B>)
+    async fn async_connect_and_read<C, B>(client: Client<C, B>)
     where
         C: Connect + Clone + Send + Sync + 'static,
         B: HttpBody + Send + 'static + std::default::Default,
@@ -47,6 +46,12 @@ async fn main() {
 
     let client = Client::new();
 
-    let request_futures = (1..get_num_requests()).map(|_| async_connect_and_read(&client));
-    join_all(request_futures).await;
+    let mut handles = Vec::new();
+    for _ in 1..get_num_requests() {
+        handles.push(tokio::spawn(async_connect_and_read(client.clone())));
+    }
+
+    for handle in handles {
+        handle.await.unwrap();
+    }
 }

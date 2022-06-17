@@ -14,8 +14,7 @@ path = "main.rs"
 ureq = "2.4.0"
 tokio = { version = "1.19.2", features = ["full"], optional = true }
 hyper = { version = "0.14.19", features = ["http1", "client", "tcp"], optional = true }
-futures = { version = "0.3.21", optional = true }
 
 [features]
 threads = []
-async = ["dep:tokio", "dep:futures", "dep:hyper"]
+async = ["dep:tokio", "dep:hyper"]

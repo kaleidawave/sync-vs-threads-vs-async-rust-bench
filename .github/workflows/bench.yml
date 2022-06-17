@@ -1,0 +1,13 @@
+name: Hyperfine and Markdown
+
+on: [push, pull_request]
+
+jobs:
+  bench:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - run: 
+          # add permissions as bench.sh might not be executable yet
+          chmod +x bench.sh
+          ./bench.sh
